@@ -72,9 +72,9 @@ const App = () => {
 
   return (
     <div style={styles.appContainer}>
-      <div style={styles.logoSection}>
+      <header style={styles.logoSection}>
         <img src="/src/assets/smart logo.png" alt="Smart Shift" style={styles.logoImg} />
-      </div>
+      </header>
 
       <nav style={styles.nav}>
         {['staff', 'admin', 'system'].map((tab) => (
@@ -89,7 +89,7 @@ const App = () => {
       </nav>
 
       <AnimatePresence mode="wait">
-        <motion.div
+        <motion.main
           key={activeTab}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -98,34 +98,34 @@ const App = () => {
         >
           {activeTab === 'admin' ? (
             <div style={styles.grid}>
-              <div style={styles.goldCard}>
+              <section style={styles.goldCard}>
                 <span style={styles.cardLabel}>Personnel Active</span>
                 <div style={styles.statValue}>12</div>
-              </div>
+              </section>
 
-              <div style={styles.goldCard}>
+              <section style={styles.goldCard}>
                 <span style={styles.cardLabel}>Security Level</span>
                 <div style={{...styles.statValue, color: '#d4af37'}}>MAX</div>
-              </div>
+              </section>
 
-              <div style={styles.goldCard}>
+              <section style={styles.goldCard}>
                 <span style={styles.cardLabel}>System Health</span>
                 <div style={styles.statValue}>99<span style={{fontSize: '1.5rem'}}>%</span></div>
-              </div>
+              </section>
 
-              <div style={styles.goldCard}>
+              <section style={styles.goldCard}>
                 <span style={styles.cardLabel}>Schedule Control</span>
                 <div style={{marginTop: '20px'}}>
                    <ScheduleBuilder />
                 </div>
-              </div>
+              </section>
             </div>
           ) : (
             <div style={{textAlign: 'center', marginTop: '100px', letterSpacing: '0.5em', color: '#666'}}>
                UNAUTHORIZED ACCESS RESTRICTED
             </div>
           )}
-        </motion.div>
+        </motion.main>
       </AnimatePresence>
     </div>
   );

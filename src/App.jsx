@@ -1,172 +1,98 @@
-
 import React, { useState } from 'react';
-import useAgent from './ai/useAgent';
+import { motion, AnimatePresence } from 'framer-motion';
+import ScheduleBuilder from './ScheduleBuilder';
 import LandingCarousel from './LandingCarousel';
-import AdminDashboard from './admin/AdminDashboard';
-import EmployeeDashboard from './employee/EmployeeDashboard';
-import { motion } from "framer-motion";
 
 const App = () => {
-
-  const [view, setView] = useState('landing');
   const [activeTab, setActiveTab] = useState(0);
 
-  // AI Agent integration
-  const agent = useAgent();
-  const [aiInput, setAiInput] = useState('');
-  const [aiOutput, setAiOutput] = useState('');
-  const [aiMode, setAiMode] = useState('question'); // 'question', 'schedule', 'optimize'
-
-  // Tutorial modal state
-  const [showTutorial, setShowTutorial] = useState(false);
-  const [tutorialStep, setTutorialStep] = useState(0);
-
-  // Touch handling for swipe
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
-
-  const tabs = [
-    { id: 0, label: 'STAFF' },
-    { id: 1, label: 'ADMIN' },
-    { id: 2, label: 'SYSTEM' }
-  ];
-
-  const handleSwipe = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
-    if (isLeftSwipe && activeTab < tabs.length - 1) {
-      setActiveTab(activeTab + 1);
-    }
-    if (isRightSwipe && activeTab > 0) {
-      setActiveTab(activeTab - 1);
+  const styles = {
+    appContainer: {
+      minHeight: '100vh',
+      backgroundColor: '#0f172a',
+      color: '#f8fafc',
+      fontFamily: '"Inter", sans-serif',
+      padding: '20px'
+    },
+    nav: {
+      display: 'flex',
+      gap: '10px',
+      marginBottom: '30px',
+      justifyContent: 'center'
+    },
+    navBtn: (active) => ({
+      padding: '10px 20px',
+      borderRadius: '8px',
+      border: 'none',
+      cursor: 'pointer',
+      backgroundColor: active ? '#3b82f6' : '#1e293b',
+      color: 'white',
+      transition: 'all 0.3s ease'
+    }),
+    carouselPage: {
+      maxWidth: '1200px',
+      margin: '0 auto'
+    },
+    adminGrid: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+      gap: '20px'
+    },
+    glassPanel: {
+      background: 'rgba(30, 41, 59, 0.7)',
+      backdropFilter: 'blur(10px)',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
+      borderRadius: '16px',
+      padding: '24px',
+      minHeight: '150px'
+    },
+    panelLabel: {
+      fontSize: '0.875rem',
+      color: '#94a3b8',
+      textTransform: 'uppercase',
+      letterSpacing: '0.05em',
+      marginBottom: '10px'
+    },
+    bigStat: {
+      fontSize: '2.5rem',
+      fontWeight: 'bold',
+      color: '#3b82f6'
+    },
+    statSub: {
+      fontSize: '1rem',
+      color: '#64748b',
+      marginLeft: '8px'
     }
   };
 
-  // Track which dashboard to show: 'admin', 'employee', or null
-  const [dashboardType, setDashboardType] = useState(null);
-  if (view === 'landing') {
-    return (
-      <LandingCarousel
-        onEmployeeLogin={() => {
-          setDashboardType('employee');
-          setView('dashboard');
-          setShowTutorial(true);
-          setTutorialStep(0);
-        }}
-        onAdminLogin={() => {
-          setDashboardType('admin');
-          setView('dashboard');
-          setShowTutorial(true);
-          setTutorialStep(0);
-        }}
-        onSignUp={() => {
-          alert('Sign up flow coming soon!');
-        }}
-      />
-    );
-  }
-
-  if (dashboardType === 'admin') {
-    return <AdminDashboard adminName="Jordan Maxwell" adminRole="General Manager" agent={agent} />;
-  }
-  if (dashboardType === 'employee') {
-    return <EmployeeDashboard />;
-  }
-
-  return (
-    <motion.div
-    initial={{opacity:0}}
-    animate={{opacity:1}}
-    transition={{duration:0.8}}
-    style={styles.dashboard}
-    >
-      {/* Tutorial Modal */}
-      {showTutorial && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'radial-gradient(circle at 20% 20%, rgba(153,27,27,0.15), transparent 40%), radial-gradient(circle at 80% 80%, rgba(153,27,27,0.12), transparent 40%), #050505', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: '#18181b', color: '#fff', padding: 40, borderRadius: 8, minWidth: 340, maxWidth: 400, textAlign: 'center', boxShadow: '0 8px 32px #000' }}>
-            <div style={{ marginBottom: 24, fontWeight: 'bold', fontSize: 18 }}>Tutorial</div>
-            <div style={{ marginBottom: 24 }}>{agent.getTutorialSteps()[tutorialStep]}</div>
-            <div>
-              <button
-                style={{ marginRight: 12, padding: '8px 18px', background: '#991b1b', color: '#fff', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}
-                onClick={() => {
-                  if (tutorialStep < agent.getTutorialSteps().length - 1) setTutorialStep(tutorialStep + 1);
-                  else setShowTutorial(false);
-                }}
-              >{tutorialStep < agent.getTutorialSteps().length - 1 ? 'Next' : 'Finish'}</button>
-              {tutorialStep > 0 && (
-                <button
-                  style={{ padding: '8px 18px', background: '#333', color: '#fff', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}
-                  onClick={() => setTutorialStep(tutorialStep - 1)}
-                >Back</button>
-              )}
+  const renderContent = () => {
+    switch (activeTab) {
+      case 0: // STAFF PORTAL
+        return (
+          <div style={styles.carouselPage}>
+            <div style={styles.glassPanel}>
+              <div style={styles.panelLabel}>Staff Portal</div>
+              <motion.div 
+                style={styles.bigStat}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                WELCOME <span style={styles.statSub}>BACK</span>
+              </motion.div>
+              <LandingCarousel />
             </div>
           </div>
-        </div>
-      )}
-      <nav style={styles.nav}>
-        <div style={styles.logoText}>SMARTSHIFT <span style={{color: '#991b1b'}}>PRO</span></div>
-        <div style={styles.tabContainer}>
-          {tabs.map((tab) => (
-            <div 
-              key={tab.id} 
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                ...styles.tabItem,
-                color: activeTab === tab.id ? '#991b1b' : '#4b5563',
-                borderBottom: activeTab === tab.id ? '3px solid #991b1b' : '3px solid transparent'
-      {['dashboard', 'schedule', 'employees', 'analytics'].map((tab) => (
-  <div
-  key={tab}
-  onClick={() => setActiveTab(tab)}
-      onMouseEnter={(e) => (e.currentTarget.style.color = '#fff')}
-      onMouseLeave={(e) =>
-        (e.currentTarget.style.color = activeTab === tab ? '#991b1b' : '#4b5563')
-      }
-      style={{
-        ...styles.tabItem,
-        color: activeTab === tab ? '#991b1b' : '#4b5563',
-      }}
-    >
-      {tab.toUpperCase()}
-    </div>
-))}        
-      <div style={styles.carouselViewport}>
-        <motion.div
-  style={styles.carouselSlider}
-  animate={{ x: `-${activeTab * 100}vw` }}
-  transition={{
-    type: "spring",
-    stiffness: 80,
-    damping: 20
-  }}
-  onTouchStart={(e) => setTouchStart(e.targetTouches[0].clientX)}
-  onTouchEnd={(e) => {
-    setTouchEnd(e.changedTouches[0].clientX);
-    handleSwipe();
-  }}
->
-          {/* TAB 0: STAFF */}
-          <div style={styles.carouselPage}>
-             <div style={styles.glassPanel}>
-                <div style={styles.panelLabel}>Staff Portal</div>
-                <motion.div
-style={styles.bigStat}
-initial={{opacity:0, y:20}}
-animate={{opacity:1, y:0}}
-transition={{duration:0.6}}
-/>
-             </div>
-          </div>
+        );
 
-          {/* TAB 1: ADMIN */}
+      case 1: // ADMIN DASHBOARD
+        return (
           <div style={styles.carouselPage}>
-             <div style={styles.adminGrid}>
-                <div style={styles.glassPanel}>
-                   <div style={styles.panelLabel}>Active Workforce</div>
-                   <motion.div
+            <div style={styles.adminGrid}>
+              {/* PANEL 1 */}
+              <div style={styles.glassPanel}>
+                <div style={styles.panelLabel}>Active Workforce</div>
+                <motion.div 
                   style={styles.bigStat}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -175,133 +101,90 @@ transition={{duration:0.6}}
                   12 <span style={styles.statSub}>UNITS</span>
                 </motion.div>
               </div>
-                <div style={styles.glassPanel}>
-                  <div style={styles.panelLabel}>Operations</div>
-                  <div style={styles.actionGrid}>
-                    <div style={styles.iconAction}>Personnel</div>
-                    <div style={styles.iconAction}>Scheduling</div>
-                  </div>
-                </div>
-             </div>
-          </div>
 
-          {/* TAB 2: SYSTEM */}
-          <div style={styles.carouselPage}>
-            <div style={styles.glassPanel}>
-              <div style={styles.panelLabel}>AI Agent Console</div>
-              <div style={{ marginBottom: 16 }}>
-                <select value={aiMode} onChange={e => setAiMode(e.target.value)} style={{ marginRight: 8 }}>
-                  <option value="question">Q&A</option>
-                  <option value="schedule">Auto-Schedule</option>
-                  <option value="optimize">Optimize Allocation</option>
-                </select>
-                <input
-                  type="text"
-                  placeholder={aiMode === 'question' ? 'Ask a question...' : aiMode === 'schedule' ? 'Enter shift/staff data' : 'Enter allocation data'}
-                  value={aiInput}
-                  onChange={e => setAiInput(e.target.value)}
-                  style={{ width: 220, marginRight: 8 }}
-                />
-                <button
-                  style={{ background: '#991b1b', color: '#fff', border: 'none', padding: '8px 16px', fontWeight: 'bold', cursor: 'pointer' }}
-                  onClick={() => {
-                    let result;
-                    if (aiMode === 'question') {
-                      result = agent.answerQuestion(aiInput);
-                      setAiOutput(result);
-                    } else if (aiMode === 'schedule') {
-                      let data;
-                      try { data = JSON.parse(aiInput); } catch { data = {}; }
-                      result = agent.autoSchedule(data.shifts || [], data.staff || [], data.constraints || {});
-                      setAiOutput(JSON.stringify(result));
-                    } else if (aiMode === 'optimize') {
-                      let data;
-                      try { data = JSON.parse(aiInput); } catch { data = {}; }
-                      result = agent.optimizeAllocation(data.staff || [], data.shifts || [], data.preferences || {});
-                      setAiOutput(JSON.stringify(result));
-                    }
-                  }}
-                >RUN</button>
-                <button
-                  style={{ background: '#333', color: '#fff', border: 'none', padding: '8px 16px', fontWeight: 'bold', marginLeft: 8, cursor: 'pointer' }}
-                  onClick={() => setAiOutput(agent.generateFeatureVideo())}
-                >Generate Feature Video</button>
-                <button
-                  style={{ background: '#222', color: '#fff', border: 'none', padding: '8px 16px', fontWeight: 'bold', marginLeft: 8, cursor: 'pointer' }}
-                  onClick={() => { setShowTutorial(true); setTutorialStep(0); }}
-                >Show Tutorial</button>
+              {/* PANEL 2 */}
+              <div style={styles.glassPanel}>
+                <div style={styles.panelLabel}>Operations</div>
+                <motion.div 
+                  style={styles.bigStat}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  08 <span style={styles.statSub}>ACTIVE</span>
+                </motion.div>
               </div>
-              <div style={{
-background: '#050505',
-color: '#00ff9c',
-padding: 14,
-minHeight: 60,
-border: '1px solid rgba(255,255,255,0.08)',
-fontFamily: 'monospace',
-fontSize: 13,
-boxShadow: 'inset 0 0 10px rgba(0,0,0,0.7)'
-}}>
-                {aiOutput || 'AI output will appear here.'}
+
+              {/* PANEL 3 */}
+              <div style={styles.glassPanel}>
+                <div style={styles.panelLabel}>System Health</div>
+                <div style={{ color: '#4ade80', fontSize: '1.5rem', marginTop: '10px' }}>
+                  ● 99.9% <span style={styles.statSub}>UPTIME</span>
+                </div>
+              </div>
+
+              {/* PANEL 4: Scheduling Board */}
+              <div style={styles.glassPanel}>
+                <div style={styles.panelLabel}>Scheduling Board</div>
+                <div style={{ marginTop: '15px' }}>
+                  <ScheduleBuilder />
+                </div>
               </div>
             </div>
           </div>
-        </motion.div>
-      </div>
-    </motion.div>
-  );
-};
+        );
 
-const styles = {
-  landingPage: { height: '100vh', background: 'radial-gradient(circle, #1a1a1a 0%, #000 100%)', display: 'flex', justifyContent: 'center', alignItems: 'center' },
-  glassSign: { background: 'rgba(20, 20, 20, 0.8)', padding: '60px', textAlign: 'center', width: '380px', border: '1px solid #333', boxShadow: '0 50px 100px rgba(0,0,0,0.9)' },
-  accentBar: { width: '50px', height: '3px', background: '#991b1b', margin: '0 auto 30px' },
-  mainTitle: { color: '#fff', letterSpacing: '10px', fontSize: '26px', fontWeight: '900' },
-  auroraInput: { background: 'transparent', border: 'none', borderBottom: '2px solid #333', color: '#991b1b', fontSize: '32px', textAlign: 'center', width: '100%', marginBottom: '40px', outline: 'none' },
-  auroraButton: { background: '#991b1b', color: '#fff', width: '100%', padding: '18px', border: 'none', fontWeight: '900', cursor: 'pointer' },
-  dashboard: {
-  height: '100vh',
-  background: `
-    radial-gradient(circle at 20% 20%, rgba(153, 27, 27, 0.15), transparent 40%),
-    radial-gradient(circle at 80% 80%, rgba(153, 27, 27, 0.12), transparent 40%),
-    #050505
-  `,
-  // ... keep other properties like overflow or display if they exist
-},, color: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column' },
-  nav: { height: '90px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 60px', background: '#000', borderBottom: '1px solid #1a1a1a' },
-  tabContainer: { display: 'flex', gap: '50px', height: '100%' },
-  tabItem: {
-  display: 'flex',
-  alignItems: 'center',
-  cursor: 'pointer',
-  fontSize: '11px',
-  fontWeight: '900',
-  letterSpacing: '2px',
-  padding: '0 10px',
-  position: 'relative',
-  transition: 'all .3s ease'
-},
-  carouselViewport: { flex: 1, width: '100vw', overflow: 'hidden' },
-  carouselSlider: { display: 'flex', width: '300vw', height: '100%', transition: 'transform 0.8s cubic-bezier(0.19, 1, 0.22, 1)' },
-  carouselPage: { width: '100vw', height: '100%', padding: '60px', boxSizing: 'border-box' },
-  adminGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', maxWidth: '1200px' },
-  glassPanel: {
-  background: 'linear-gradient(145deg, #0a0a0a, #050505)',
-  border: '1px solid rgba(255,255,255,0.05)',
-  padding: '40px',
-  borderRadius: '14px',
-  backdropFilter: 'blur(10px)',
-  boxShadow: `
-    0 0 40px rgba(153, 27, 27, 0.15),
-    inset 0 0 10px rgba(255, 255, 255, 0.03)
-  `
-}, 
-  panelLabel: { color: '#4b5563', fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '20px' },
-  bigStat: { fontSize: '50px', fontWeight: '900', color: '#fff' },
-  statSub: { fontSize: '14px', color: '#991b1b' },
-  actionGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' },
-  iconAction: { background: '#0f0f0f', padding: '20px', textAlign: 'center', fontSize: '10px', border: '1px solid #1a1a1a' },
-  logoutBtn: { background: 'none', border: '1px solid #333', color: '#4b5563', padding: '8px 20px', cursor: 'pointer' },
-  logoText: { fontWeight: '900', letterSpacing: '4px', fontSize: '20px' }
+      case 2: // SYSTEM STATUS
+        return (
+          <div style={styles.carouselPage}>
+            <div style={styles.glassPanel}>
+              <div style={styles.panelLabel}>System Logs</div>
+              <p>All modules operational. No critical errors found.</p>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div style={styles.appContainer}>
+      <nav style={styles.nav}>
+        <button 
+          style={styles.navBtn(activeTab === 0)} 
+          onClick={() => setActiveTab(0)}
+        >
+          Staff
+        </button>
+        <button 
+          style={styles.navBtn(activeTab === 1)} 
+          onClick={() => setActiveTab(1)}
+        >
+          Admin
+        </button>
+        <button 
+          style={styles.navBtn(activeTab === 2)} 
+          onClick={() => setActiveTab(2)}
+        >
+          System
+        </button>
+      </nav>
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, x: 10 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -10 }}
+          transition={{ duration: 0.3 }}
+        >
+          {renderContent()}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
 };
 
 export default App;

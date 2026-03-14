@@ -159,8 +159,8 @@ const styles = {
   profilePic: { width: 56, height: 56, borderRadius: '50%', border: '2px solid #4a90e2', cursor: 'pointer', boxShadow: '0 2px 12px #4a90e244' },
   dropdownMenu: { position: 'absolute', top: 60, right: 0, background: '#3a3a4a', border: '1px solid #4a90e2', borderRadius: 8, boxShadow: '0 2px 12px #4a90e244', zIndex: 10 },
   dropdownItem: { padding: '12px 32px', color: '#fff', cursor: 'pointer', fontWeight: 700, borderBottom: '1px solid #4a90e222' },
-  mainContent: { display: 'flex', flex: 1, padding: '40px 48px', gap: 32 },
-  calendarSection: { flex: 2, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' },
+  mainContent: { display: 'flex', flex: 1, padding: '40px 48px', gap: 32, alignItems: 'flex-start' },
+  calendarSection: { flex: 3, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', maxWidth: '70%' },
   calendarTitle: {
     fontWeight: 900,
     fontSize: 24,

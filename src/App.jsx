@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import ScheduleBuilder from './ScheduleBuilder';
+import ScheduleBuilder from "./ScheduleBuilder.jsx";
 import LandingCarousel from './LandingCarousel';
 
 const App = () => {

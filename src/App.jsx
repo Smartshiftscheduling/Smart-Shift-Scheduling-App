@@ -9,7 +9,6 @@ const App = () => {
 
   const [view, setView] = useState('landing');
   const [activeTab, setActiveTab] = useState(0);
-  const [idInput, setIdInput] = useState('');
 
   // AI Agent integration
   const agent = useAgent();
@@ -26,15 +25,6 @@ const App = () => {
     { id: 1, label: 'ADMIN' },
     { id: 2, label: 'SYSTEM' }
   ];
-
-  const handleLogin = () => {
-    if (idInput === 'ADMIN-MASTER' || idInput.length >= 4) {
-      setView('dashboard');
-      // Show tutorial for new users
-      setShowTutorial(true);
-      setTutorialStep(0);
-    } else alert("Access Denied");
-  };
 
   // Track which dashboard to show: 'admin', 'employee', or null
   const [dashboardType, setDashboardType] = useState(null);

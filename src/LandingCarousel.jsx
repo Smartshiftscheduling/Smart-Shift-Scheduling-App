@@ -3,12 +3,9 @@
 // Reference image: 69a7c900470b5eb327bd6bd8_image-4.webp (not used as background)
 // New design: 3 separate glass cards (center: demo/pricing/signup, left: employee sign in, right: admin sign in)
 
-const landingTabs = [
-  { id: 0, label: 'Overview & Sign Up' },
-  { id: 1, label: 'Employee Sign On' },
-  { id: 2, label: 'Admin Sign On' }
-];
+import React, { useState } from 'react';
 
+const LandingCarousel = ({ onEmployeeLogin, onAdminLogin, onSignUp }) => {
   const [focus, setFocus] = useState('main'); // 'main', 'employee', 'admin'
 
   return (
@@ -66,7 +63,9 @@ const landingTabs = [
       </div>
     </div>
   );
-}
+};
+
+export default LandingCarousel;
 
 const styles = {
   landingRoot: {

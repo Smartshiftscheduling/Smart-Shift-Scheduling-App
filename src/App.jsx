@@ -85,8 +85,8 @@ const App = () => {
           >
             {tab}
           </button>
-        ))}
-      </nav>
+   
+   ))}
 
       <AnimatePresence mode="wait">
         <motion.div
@@ -128,6 +128,8 @@ const App = () => {
         </motion.div>
       </AnimatePresence>
     </div>
+      ^
+      ^
   );
 };
 

@@ -117,15 +117,22 @@ const App = () => {
                 ...styles.tabItem,
                 color: activeTab === tab.id ? '#991b1b' : '#4b5563',
                 borderBottom: activeTab === tab.id ? '3px solid #991b1b' : '3px solid transparent'
-              }}
-            >
-              {tab.label}
-            </div>
-          ))}
-        </div>
-        <button onClick={() => setView('landing')} style={styles.logoutBtn}>EXIT</button>
-      </nav>
-
+      {['dashboard', 'schedule', 'employees', 'analytics'].map((tab) => (
+  <div
+  key={tab}
+  onClick={() => setActiveTab(tab)}
+      onMouseEnter={(e) => (e.currentTarget.style.color = '#fff')}
+      onMouseLeave={(e) =>
+        (e.currentTarget.style.color = activeTab === tab ? '#991b1b' : '#4b5563')
+      }
+      style={{
+        ...styles.tabItem,
+        color: activeTab === tab ? '#991b1b' : '#4b5563',
+      }}
+    >
+      {tab.toUpperCase()}
+    </div>
+))}        
       <div style={styles.carouselViewport}>
         <motion.div
   style={styles.carouselSlider}
@@ -158,9 +165,16 @@ transition={{duration:0.6}}
           <div style={styles.carouselPage}>
              <div style={styles.adminGrid}>
                 <div style={styles.glassPanel}>
-                  <div style={styles.panelLabel}>Active Workforce</div>
-                  <div style={styles.bigStat}>12 <span style={styles.statSub}>UNITS</span></div>
-                </div>
+                   <div style={styles.panelLabel}>Active Workforce</div>
+                   <motion.div
+                  style={styles.bigStat}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  12 <span style={styles.statSub}>UNITS</span>
+                </motion.div>
+              </div>
                 <div style={styles.glassPanel}>
                   <div style={styles.panelLabel}>Operations</div>
                   <div style={styles.actionGrid}>
@@ -244,15 +258,43 @@ const styles = {
   mainTitle: { color: '#fff', letterSpacing: '10px', fontSize: '26px', fontWeight: '900' },
   auroraInput: { background: 'transparent', border: 'none', borderBottom: '2px solid #333', color: '#991b1b', fontSize: '32px', textAlign: 'center', width: '100%', marginBottom: '40px', outline: 'none' },
   auroraButton: { background: '#991b1b', color: '#fff', width: '100%', padding: '18px', border: 'none', fontWeight: '900', cursor: 'pointer' },
-  dashboard: { height: '100vh', background: '#050505', color: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column' },
+  dashboard: {
+  height: '100vh',
+  background: `
+    radial-gradient(circle at 20% 20%, rgba(153, 27, 27, 0.15), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(153, 27, 27, 0.12), transparent 40%),
+    #050505
+  `,
+  // ... keep other properties like overflow or display if they exist
+},, color: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column' },
   nav: { height: '90px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 60px', background: '#000', borderBottom: '1px solid #1a1a1a' },
   tabContainer: { display: 'flex', gap: '50px', height: '100%' },
-  tabItem: { display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '11px', fontWeight: '900', letterSpacing: '2px', transition: '0.4s' },
+  tabItem: {
+  display: 'flex',
+  alignItems: 'center',
+  cursor: 'pointer',
+  fontSize: '11px',
+  fontWeight: '900',
+  letterSpacing: '2px',
+  padding: '0 10px',
+  position: 'relative',
+  transition: 'all .3s ease'
+},
   carouselViewport: { flex: 1, width: '100vw', overflow: 'hidden' },
   carouselSlider: { display: 'flex', width: '300vw', height: '100%', transition: 'transform 0.8s cubic-bezier(0.19, 1, 0.22, 1)' },
   carouselPage: { width: '100vw', height: '100%', padding: '60px', boxSizing: 'border-box' },
   adminGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', maxWidth: '1200px' },
-  glassPanel: { background: '#0a0a0a', border: '1px solid #1a1a1a', padding: '40px', boxShadow: '10px 10px 30px rgba(0,0,0,0.5)' },
+  glassPanel: {
+  background: 'linear-gradient(145deg, #0a0a0a, #050505)',
+  border: '1px solid rgba(255,255,255,0.05)',
+  padding: '40px',
+  borderRadius: '14px',
+  backdropFilter: 'blur(10px)',
+  boxShadow: `
+    0 0 40px rgba(153, 27, 27, 0.15),
+    inset 0 0 10px rgba(255, 255, 255, 0.03)
+  `
+}, 
   panelLabel: { color: '#4b5563', fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '20px' },
   bigStat: { fontSize: '50px', fontWeight: '900', color: '#fff' },
   statSub: { fontSize: '14px', color: '#991b1b' },

@@ -1,6 +1,6 @@
 // src/LandingCarousel.jsx
 import React, { useState, useRef } from 'react';
-import SmartShiftLogo from './SmartShiftLogo.svg';
+import carouselBg from './assets/69a7c900470b5eb327bd6bd8_image-4.webp';
 
 const landingTabs = [
   { id: 0, label: 'Overview & Sign Up' },
@@ -28,25 +28,31 @@ export default function LandingCarousel({ onEmployeeLogin, onAdminLogin, onSignU
     <div style={styles.carouselRoot} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
       <div style={{ ...styles.carouselSlider, transform: `translateX(-${activeTab * 100}vw)` }}>
         {/* Tab 1: Overview & Sign Up */}
-        <div style={styles.carouselPage}>
-          <img src={SmartShiftLogo} alt="Smart Shift Logo" style={{ width: 120, height: 120, marginBottom: 24, filter: 'drop-shadow(0 4px 24px #991b1b88)' }} />
-          <h2 style={styles.title}>Welcome to Smart Shift Scheduling</h2>
-          <p style={styles.desc}>Effortlessly manage shifts, staff, and operations with AI-powered tools.</p>
-          <button style={styles.button} onClick={onSignUp}>New Business Sign Up</button>
+        <div style={{ ...styles.carouselPage, backgroundImage: `url(${carouselBg})` }}>
+          <div style={styles.overlay} />
+          <div style={styles.contentWrap}>
+            <h2 style={styles.title}>Welcome to Smart Shift Scheduling</h2>
+            <p style={styles.desc}>Effortlessly manage shifts, staff, and operations with AI-powered tools.</p>
+            <button style={styles.button} onClick={onSignUp}>New Business Sign Up</button>
+          </div>
         </div>
         {/* Tab 2: Employee Sign On */}
-        <div style={styles.carouselPage}>
-          <img src={SmartShiftLogo} alt="Smart Shift Logo" style={{ width: 80, height: 80, marginBottom: 18, filter: 'drop-shadow(0 2px 12px #991b1b88)' }} />
-          <h2 style={styles.title}>Employee Sign On</h2>
-          <input type="text" placeholder="Employee ID" style={styles.input} />
-          <button style={styles.button} onClick={onEmployeeLogin}>Sign In</button>
+        <div style={{ ...styles.carouselPage, backgroundImage: `url(${carouselBg})` }}>
+          <div style={styles.overlay} />
+          <div style={styles.contentWrap}>
+            <h2 style={styles.title}>Employee Sign On</h2>
+            <input type="text" placeholder="Employee ID" style={styles.input} />
+            <button style={styles.button} onClick={onEmployeeLogin}>Sign In</button>
+          </div>
         </div>
         {/* Tab 3: Admin Sign On */}
-        <div style={styles.carouselPage}>
-          <img src={SmartShiftLogo} alt="Smart Shift Logo" style={{ width: 80, height: 80, marginBottom: 18, filter: 'drop-shadow(0 2px 12px #991b1b88)' }} />
-          <h2 style={styles.title}>Admin Sign On</h2>
-          <input type="password" placeholder="Admin Code" style={styles.input} />
-          <button style={styles.button} onClick={onAdminLogin}>Admin Login</button>
+        <div style={{ ...styles.carouselPage, backgroundImage: `url(${carouselBg})` }}>
+          <div style={styles.overlay} />
+          <div style={styles.contentWrap}>
+            <h2 style={styles.title}>Admin Sign On</h2>
+            <input type="password" placeholder="Admin Code" style={styles.input} />
+            <button style={styles.button} onClick={onAdminLogin}>Admin Login</button>
+          </div>
         </div>
       </div>
       <div style={styles.tabDots}>
@@ -68,7 +74,7 @@ const styles = {
     height: '100vh',
     overflow: 'hidden',
     position: 'relative',
-    background: 'linear-gradient(135deg, #18181b 0%, #23232b 60%, #991b1b 100%)',
+    background: '#18181b',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -87,13 +93,33 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     boxSizing: 'border-box',
+    padding: 0,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    position: 'relative',
+    margin: 0,
+    border: 'none',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    background: 'linear-gradient(120deg, rgba(24,24,27,0.92) 60%, #991b1b88 100%)',
+    zIndex: 1,
+    borderRadius: 0,
+  },
+  contentWrap: {
+    position: 'relative',
+    zIndex: 2,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
     padding: 40,
-    background: 'rgba(30, 30, 40, 0.7)',
-    boxShadow: '0 12px 48px 0 #000a, 0 2px 24px 0 #991b1b55',
-    borderRadius: 32,
-    margin: 24,
-    backdropFilter: 'blur(18px)',
-    border: '2px solid #991b1b44',
   },
   title: {
     color: '#fff',
@@ -152,6 +178,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     gap: 16,
+    zIndex: 3,
   },
   dot: {
     width: 18,

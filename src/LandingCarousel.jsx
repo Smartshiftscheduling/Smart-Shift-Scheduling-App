@@ -32,6 +32,23 @@ export default function LandingCarousel({ onEmployeeLogin, onAdminLogin, onSignU
           <div style={styles.slogan}>"Empowering Teams. Simplifying Shifts."</div>
         </div>
         <div style={styles.glassCard}>
+          <div style={styles.tabBar}>
+            {landingTabs.map((tab, idx) => (
+              <button
+                key={tab.id}
+                style={{
+                  ...styles.tabButton,
+                  background: activeTab === idx ? 'linear-gradient(90deg, #991b1b 60%, #23232b 100%)' : 'rgba(40,40,60,0.5)',
+                  color: activeTab === idx ? '#fff' : '#bbb',
+                  boxShadow: activeTab === idx ? '0 2px 12px #991b1b44' : 'none',
+                  border: activeTab === idx ? '2px solid #991b1b' : '2px solid transparent',
+                }}
+                onClick={() => setActiveTab(idx)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
           <div style={{ ...styles.carouselSlider, transform: `translateX(-${activeTab * 100}%)` }}>
             {/* Tab 1: Overview & Sign Up */}
             <div style={styles.carouselPage}>
@@ -51,15 +68,6 @@ export default function LandingCarousel({ onEmployeeLogin, onAdminLogin, onSignU
               <input type="password" placeholder="Admin Code" style={styles.input} />
               <button style={styles.button} onClick={onAdminLogin}>Admin Login</button>
             </div>
-          </div>
-          <div style={styles.tabDots}>
-            {landingTabs.map((tab, idx) => (
-              <span
-                key={tab.id}
-                style={{ ...styles.dot, background: activeTab === idx ? '#991b1b' : '#444' }}
-                onClick={() => setActiveTab(idx)}
-              />
-            ))}
           </div>
         </div>
       </div>
@@ -111,20 +119,46 @@ const styles = {
   },
   glassCard: {
     background: 'rgba(30, 30, 40, 0.85)',
-    borderRadius: 32,
-    boxShadow: '0 12px 48px 0 #000a, 0 2px 24px 0 #991b1b55',
-    border: '2px solid #991b1b44',
-    backdropFilter: 'blur(18px)',
+    borderRadius: 36,
+    boxShadow: '0 16px 64px 0 #000b, 0 4px 32px 0 #991b1b66',
+    border: '2.5px solid #991b1b55',
+    backdropFilter: 'blur(22px)',
     padding: 0,
     minWidth: 420,
     maxWidth: 440,
-    minHeight: 420,
+    minHeight: 440,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     position: 'relative',
     overflow: 'hidden',
+    margin: '0 auto',
+  },
+  tabBar: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 18,
+    width: '100%',
+    padding: '32px 0 18px 0',
+    background: 'none',
+    zIndex: 2,
+  },
+  tabButton: {
+    fontWeight: 900,
+    fontSize: 16,
+    padding: '12px 32px',
+    borderRadius: 32,
+    border: '2px solid transparent',
+    outline: 'none',
+    cursor: 'pointer',
+    background: 'rgba(40,40,60,0.5)',
+    color: '#bbb',
+    boxShadow: 'none',
+    letterSpacing: 1,
+    transition: 'all 0.25s cubic-bezier(0.19, 1, 0.22, 1)',
+    marginBottom: 0,
   },
   carouselSlider: {
     display: 'flex',

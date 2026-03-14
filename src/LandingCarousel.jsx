@@ -220,5 +220,4 @@ const styles = {
     textTransform: 'uppercase',
     transition: 'background 0.3s, color 0.3s',
   },
-}
 };

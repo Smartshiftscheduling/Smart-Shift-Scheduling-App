@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import SmartShiftLogo from '../SmartShiftLogo.svg';
+import SchedulingBoard from './SchedulingBoard';
 
 const adminRoles = [
   'Supervisor',
@@ -17,7 +18,21 @@ const employeesSample = [
   { name: 'Alex Lee', type: 'Seasonal', id: '10003' },
 ];
 
-export default function AdminDashboard({ adminName = 'Admin User', adminRole = 'Manager', profilePic }) {
+const staff = [
+  { id:"john", name:"John", availability:["mon","tue","wed"] },
+  { id:"sarah", name:"Sarah", availability:["mon","thu","fri"] },
+  { id:"mike", name:"Mike", availability:["tue","wed","fri"] }
+];
+
+const shifts = [
+  { id:"s1", day:"mon", start:9, end:17, hours:8 },
+  { id:"s2", day:"tue", start:9, end:17, hours:8 },
+  { id:"s3", day:"wed", start:9, end:17, hours:8 },
+  { id:"s4", day:"thu", start:9, end:17, hours:8 },
+  { id:"s5", day:"fri", start:9, end:17, hours:8 }
+];
+
+export default function AdminDashboard({ adminName = 'Admin User', adminRole = 'Manager', profilePic, agent }) {
   const [role, setRole] = useState(adminRole);
   const [dropdown, setDropdown] = useState(false);
   const [hours, setHours] = useState('');
@@ -117,6 +132,14 @@ export default function AdminDashboard({ adminName = 'Admin User', adminRole = '
               <li key={i} style={styles.notificationItem}>{n}</li>
             ))}
           </ul>
+        </div>
+        {/* Section 4: Scheduling Board */}
+        <div style={styles.section}>
+          <SchedulingBoard
+            staff={staff}
+            shifts={shifts}
+            agent={agent}
+          />
         </div>
       </div>
     </div>

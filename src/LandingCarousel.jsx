@@ -112,25 +112,18 @@ const styles = {
     maxWidth: 1400,
     margin: '0 auto',
   },
-  glassCard: {
-    background: 'rgba(30, 30, 40, 0.85)',
-    borderRadius: 36,
-    boxShadow: '0 16px 64px 0 #000b, 0 4px 32px 0 #991b1b66',
-    border: '2.5px solid #991b1b55',
-    backdropFilter: 'blur(22px)',
-    padding: '40px 32px',
-    minWidth: 340,
-    maxWidth: 420,
-    minHeight: 420,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-    overflow: 'hidden',
-    cursor: 'pointer',
-    transition: 'transform 0.3s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 0.3s',
-  },
+  glassPanel: {
+  background: 'linear-gradient(145deg,#0a0a0a,#050505)',
+  border: '1px solid rgba(255,255,255,0.05)',
+  padding: '40px',
+  borderRadius: '14px',
+  backdropFilter: 'blur(10px)',
+  boxShadow: `
+  0 0 40px rgba(153,27,27,0.15),
+  inset 0 0 10px rgba(255,255,255,0.03)
+  `
+},
+
   sideCard: {
     opacity: 0.85,
     transform: 'scale(0.92)',

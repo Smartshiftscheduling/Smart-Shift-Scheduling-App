@@ -1,16 +1,18 @@
 // src/ai/Agent.js
 // Modular AI Agent for Smart Shift Scheduling App
+import SmartScheduler from './smartScheduler';
 
 
 class Agent {
   constructor() {
     // Initialize agent state or config here
     this.isFirstTimeUser = true;
+    this.scheduler = new SmartScheduler();
   }
 
   // Auto-schedule shifts based on input data
   autoSchedule(shifts, staff, constraints) {
-    return { scheduledShifts: [], message: 'Auto-scheduling not yet implemented.' };
+    return this.scheduler.autoSchedule(shifts, staff, constraints);
   }
 
   // Answer user questions and troubleshoot
@@ -26,9 +28,14 @@ class Agent {
     return 'Q&A feature not yet implemented.';
   }
 
-  // Optimize staff allocation (stub for now)
+  // Optimize staff allocation
   optimizeAllocation(staff, shifts, preferences) {
-    return { optimized: false, message: 'Optimization not yet implemented.' };
+    return this.scheduler.optimizeAllocation(staff, shifts, preferences);
+  }
+
+  // Suggest shift swaps
+  suggestSwap(schedule, staff) {
+    return this.scheduler.suggestSwap(schedule, staff);
   }
 
   // Tutorial for new users

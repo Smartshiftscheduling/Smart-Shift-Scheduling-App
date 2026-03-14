@@ -4,6 +4,7 @@ import useAgent from './ai/useAgent';
 import LandingCarousel from './LandingCarousel';
 import AdminDashboard from './admin/AdminDashboard';
 import EmployeeDashboard from './employee/EmployeeDashboard';
+import { motion } from "framer-motion";
 
 const App = () => {
 
@@ -20,11 +21,28 @@ const App = () => {
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialStep, setTutorialStep] = useState(0);
 
+  // Touch handling for swipe
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
   const tabs = [
     { id: 0, label: 'STAFF' },
     { id: 1, label: 'ADMIN' },
     { id: 2, label: 'SYSTEM' }
   ];
+
+  const handleSwipe = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+    if (isLeftSwipe && activeTab < tabs.length - 1) {
+      setActiveTab(activeTab + 1);
+    }
+    if (isRightSwipe && activeTab > 0) {
+      setActiveTab(activeTab - 1);
+    }
+  };
 
   // Track which dashboard to show: 'admin', 'employee', or null
   const [dashboardType, setDashboardType] = useState(null);
@@ -51,17 +69,22 @@ const App = () => {
   }
 
   if (dashboardType === 'admin') {
-    return <AdminDashboard adminName="Jordan Maxwell" adminRole="General Manager" />;
+    return <AdminDashboard adminName="Jordan Maxwell" adminRole="General Manager" agent={agent} />;
   }
   if (dashboardType === 'employee') {
     return <EmployeeDashboard />;
   }
 
   return (
-    <div style={styles.dashboard}>
+    <motion.div
+    initial={{opacity:0}}
+    animate={{opacity:1}}
+    transition={{duration:0.8}}
+    style={styles.dashboard}
+    >
       {/* Tutorial Modal */}
       {showTutorial && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'radial-gradient(circle at 20% 20%, rgba(153,27,27,0.15), transparent 40%), radial-gradient(circle at 80% 80%, rgba(153,27,27,0.12), transparent 40%), #050505', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: '#18181b', color: '#fff', padding: 40, borderRadius: 8, minWidth: 340, maxWidth: 400, textAlign: 'center', boxShadow: '0 8px 32px #000' }}>
             <div style={{ marginBottom: 24, fontWeight: 'bold', fontSize: 18 }}>Tutorial</div>
             <div style={{ marginBottom: 24 }}>{agent.getTutorialSteps()[tutorialStep]}</div>
@@ -104,15 +127,30 @@ const App = () => {
       </nav>
 
       <div style={styles.carouselViewport}>
-        <div style={{
-          ...styles.carouselSlider,
-          transform: `translateX(-${activeTab * 100}vw)` 
-        }}>
+        <motion.div
+  style={styles.carouselSlider}
+  animate={{ x: `-${activeTab * 100}vw` }}
+  transition={{
+    type: "spring",
+    stiffness: 80,
+    damping: 20
+  }}
+  onTouchStart={(e) => setTouchStart(e.targetTouches[0].clientX)}
+  onTouchEnd={(e) => {
+    setTouchEnd(e.changedTouches[0].clientX);
+    handleSwipe();
+  }}
+>
           {/* TAB 0: STAFF */}
           <div style={styles.carouselPage}>
              <div style={styles.glassPanel}>
                 <div style={styles.panelLabel}>Staff Portal</div>
-                <div style={styles.bigStat}>08:00 <span style={styles.statSub}>READY</span></div>
+                <motion.div
+style={styles.bigStat}
+initial={{opacity:0, y:20}}
+animate={{opacity:1, y:0}}
+transition={{duration:0.6}}
+/>
              </div>
           </div>
 
@@ -179,14 +217,23 @@ const App = () => {
                   onClick={() => { setShowTutorial(true); setTutorialStep(0); }}
                 >Show Tutorial</button>
               </div>
-              <div style={{ background: '#18181b', color: '#fff', padding: 12, minHeight: 40, border: '1px solid #333', fontSize: 13 }}>
+              <div style={{
+background: '#050505',
+color: '#00ff9c',
+padding: 14,
+minHeight: 60,
+border: '1px solid rgba(255,255,255,0.08)',
+fontFamily: 'monospace',
+fontSize: 13,
+boxShadow: 'inset 0 0 10px rgba(0,0,0,0.7)'
+}}>
                 {aiOutput || 'AI output will appear here.'}
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

@@ -1,140 +1,128 @@
 import React, { useState } from 'react';
 
 const App = () => {
-  const [view, setView] = useState('landing'); // landing, staff, admin
+  const [view, setView] = useState('landing');
+  const [activeTab, setActiveTab] = useState(0); 
   const [idInput, setIdInput] = useState('');
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
 
-  // Authentication Logic
+  const tabs = [
+    { id: 0, label: 'STAFF' },
+    { id: 1, label: 'ADMIN' },
+    { id: 2, label: 'SYSTEM' }
+  ];
+
   const handleLogin = () => {
-    if (idInput === 'ADMIN-MASTER') {
-      setView('admin');
-    } else if (idInput.length >= 4) {
-      setView('staff');
-    } else {
-      alert("Please enter a valid 4-digit ID or Admin Code");
-    }
+    if (idInput === 'ADMIN-MASTER' || idInput.length >= 4) setView('dashboard');
+    else alert("Access Denied");
   };
-
-  // --- UI COMPONENTS ---
-
-  const Navigation = ({ userRole }) => (
-    <nav style={styles.nav}>
-      <div style={styles.logo}>SMARTSHIFT V4.0</div>
-      <div style={styles.navRight}>
-        <span style={styles.roleBadge}>{userRole}</span>
-        <div style={styles.profileArea}>
-          <img 
-            src="https://via.placeholder.com/40" 
-            alt="Profile" 
-            style={styles.profilePic} 
-            onClick={() => setShowProfileMenu(!showProfileMenu)}
-          />
-          {showProfileMenu && (
-            <div style={styles.dropdown}>
-              <div style={styles.dropItem}>My Profile</div>
-              <div style={styles.dropItem}>Settings</div>
-              <div style={styles.dropItem} onClick={() => setView('landing')}>Logout</div>
-            </div>
-          )}
-        </div>
-      </div>
-    </nav>
-  );
-
-  const Calendar = () => (
-    <div style={styles.calendarCard}>
-      <h3 style={{color: '#fff', marginBottom: '15px'}}>March 2026</h3>
-      <div style={styles.calendarGrid}>
-        {['S','M','T','W','T','F','S'].map(d => <div key={d} style={styles.dayHeader}>{d}</div>)}
-        {[...Array(31)].map((_, i) => (
-          <div key={i} style={styles.daySlot}>
-            {i + 1}
-            {i === 14 && <div style={styles.shiftDot} />}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  // --- VIEWS ---
 
   if (view === 'landing') {
     return (
-      <div style={styles.landingContainer}>
-        <div style={styles.loginCard}>
-          <h1>Staff Portal</h1>
+      <div style={styles.landingPage}>
+        <div style={styles.glassSign}>
+          <div style={styles.accentBar}></div>
+          <h1 style={styles.mainTitle}>SMARTSHIFT</h1>
           <input 
             type="password" 
-            placeholder="Employee ID" 
-            style={styles.input}
+            placeholder="••••" 
+            style={styles.auroraInput}
             value={idInput}
             onChange={(e) => setIdInput(e.target.value)}
           />
-          <button style={styles.button} onClick={handleLogin}>INITIALIZE ACCESS</button>
+          <button style={styles.auroraButton} onClick={handleLogin}>INITIALIZE</button>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={styles.dashboardContainer}>
-      <Navigation userRole={view === 'admin' ? 'ADMINISTRATOR' : 'STAFF MEMBER'} />
-      
-      <div style={styles.mainContent}>
-        <div style={styles.leftCol}>
-          <h2>{view === 'admin' ? 'Business Overview' : 'My Schedule'}</h2>
-          <div style={styles.statusCard}>
-            {view === 'admin' ? (
-              <div>
-                <p>Active Employees: 12</p>
-                <p>Open Shifts: 4</p>
-              </div>
-            ) : (
-              <div>
-                <p>Next Shift: Tomorrow 08:00 AM</p>
-                <p>Total Hours (Week): 32.5</p>
-              </div>
-            )}
-          </div>
-          <button style={styles.actionBtn}>
-            {view === 'admin' ? '+ Create New Shift' : 'Clock In'}
-          </button>
+    <div style={styles.dashboard}>
+      <nav style={styles.nav}>
+        <div style={styles.logoText}>SMARTSHIFT <span style={{color: '#991b1b'}}>PRO</span></div>
+        <div style={styles.tabContainer}>
+          {tabs.map((tab) => (
+            <div 
+              key={tab.id} 
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                ...styles.tabItem,
+                color: activeTab === tab.id ? '#991b1b' : '#4b5563',
+                borderBottom: activeTab === tab.id ? '3px solid #991b1b' : '3px solid transparent'
+              }}
+            >
+              {tab.label}
+            </div>
+          ))}
         </div>
+        <button onClick={() => setView('landing')} style={styles.logoutBtn}>EXIT</button>
+      </nav>
 
-        <div style={styles.rightCol}>
-          <Calendar />
+      <div style={styles.carouselViewport}>
+        <div style={{
+          ...styles.carouselSlider,
+          transform: `translateX(-${activeTab * 100}vw)` 
+        }}>
+          {/* TAB 0: STAFF */}
+          <div style={styles.carouselPage}>
+             <div style={styles.glassPanel}>
+                <div style={styles.panelLabel}>Staff Portal</div>
+                <div style={styles.bigStat}>08:00 <span style={styles.statSub}>READY</span></div>
+             </div>
+          </div>
+
+          {/* TAB 1: ADMIN */}
+          <div style={styles.carouselPage}>
+             <div style={styles.adminGrid}>
+                <div style={styles.glassPanel}>
+                  <div style={styles.panelLabel}>Active Workforce</div>
+                  <div style={styles.bigStat}>12 <span style={styles.statSub}>UNITS</span></div>
+                </div>
+                <div style={styles.glassPanel}>
+                  <div style={styles.panelLabel}>Operations</div>
+                  <div style={styles.actionGrid}>
+                    <div style={styles.iconAction}>Personnel</div>
+                    <div style={styles.iconAction}>Scheduling</div>
+                  </div>
+                </div>
+             </div>
+          </div>
+
+          {/* TAB 2: SYSTEM */}
+          <div style={styles.carouselPage}>
+             <div style={styles.glassPanel}>
+                <div style={styles.panelLabel}>Security</div>
+                <div style={{fontSize: '40px', color: '#991b1b', fontWeight: 'bold'}}>ENCRYPTED</div>
+             </div>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-// --- STYLING (The Look) ---
 const styles = {
-  landingContainer: { height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#0f172a' },
-  loginCard: { background: '#1e293b', padding: '40px', borderRadius: '12px', textAlign: 'center', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' },
-  input: { padding: '12px', width: '250px', borderRadius: '6px', border: '1px solid #334155', marginBottom: '20px', display: 'block', background: '#0f172a', color: '#fff' },
-  button: { background: '#f59e0b', color: '#000', padding: '12px 24px', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' },
-  dashboardContainer: { minHeight: '100vh', background: '#0f172a', color: '#fff' },
-  nav: { height: '70px', background: '#1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 30px', borderBottom: '1px solid #334155' },
-  navRight: { display: 'flex', alignItems: 'center', gap: '20px' },
-  profilePic: { width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', border: '2px solid #f59e0b' },
-  profileArea: { position: 'relative' },
-  dropdown: { position: 'absolute', top: '50px', right: '0', background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', width: '150px', overflow: 'hidden', zIndex: 100 },
-  dropItem: { padding: '12px', fontSize: '14px', cursor: 'pointer', borderBottom: '1px solid #334155' },
-  mainContent: { padding: '30px', display: 'flex', gap: '30px' },
-  leftCol: { flex: 2 },
-  rightCol: { flex: 1 },
-  calendarCard: { background: '#1e293b', padding: '20px', borderRadius: '12px', border: '1px solid #334155' },
-  calendarGrid: { display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '5px' },
-  dayHeader: { textAlign: 'center', fontSize: '12px', color: '#94a3b8', paddingBottom: '10px' },
-  daySlot: { height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', background: '#0f172a', borderRadius: '4px', position: 'relative' },
-  shiftDot: { width: '6px', height: '6px', background: '#f59e0b', borderRadius: '50%', position: 'absolute', bottom: '4px' },
-  statusCard: { background: '#1e293b', padding: '20px', borderRadius: '12px', marginBottom: '20px' },
-  actionBtn: { padding: '15px 30px', borderRadius: '8px', border: 'none', background: '#f59e0b', fontWeight: 'bold', cursor: 'pointer' },
-  roleBadge: { background: '#334155', padding: '4px 12px', borderRadius: '20px', fontSize: '12px' },
-  logo: { fontWeight: 'bold', fontSize: '18px', color: '#f59e0b' }
+  landingPage: { height: '100vh', background: 'radial-gradient(circle, #1a1a1a 0%, #000 100%)', display: 'flex', justifyContent: 'center', alignItems: 'center' },
+  glassSign: { background: 'rgba(20, 20, 20, 0.8)', padding: '60px', textAlign: 'center', width: '380px', border: '1px solid #333', boxShadow: '0 50px 100px rgba(0,0,0,0.9)' },
+  accentBar: { width: '50px', height: '3px', background: '#991b1b', margin: '0 auto 30px' },
+  mainTitle: { color: '#fff', letterSpacing: '10px', fontSize: '26px', fontWeight: '900' },
+  auroraInput: { background: 'transparent', border: 'none', borderBottom: '2px solid #333', color: '#991b1b', fontSize: '32px', textAlign: 'center', width: '100%', marginBottom: '40px', outline: 'none' },
+  auroraButton: { background: '#991b1b', color: '#fff', width: '100%', padding: '18px', border: 'none', fontWeight: '900', cursor: 'pointer' },
+  dashboard: { height: '100vh', background: '#050505', color: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column' },
+  nav: { height: '90px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 60px', background: '#000', borderBottom: '1px solid #1a1a1a' },
+  tabContainer: { display: 'flex', gap: '50px', height: '100%' },
+  tabItem: { display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '11px', fontWeight: '900', letterSpacing: '2px', transition: '0.4s' },
+  carouselViewport: { flex: 1, width: '100vw', overflow: 'hidden' },
+  carouselSlider: { display: 'flex', width: '300vw', height: '100%', transition: 'transform 0.8s cubic-bezier(0.19, 1, 0.22, 1)' },
+  carouselPage: { width: '100vw', height: '100%', padding: '60px', boxSizing: 'border-box' },
+  adminGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', maxWidth: '1200px' },
+  glassPanel: { background: '#0a0a0a', border: '1px solid #1a1a1a', padding: '40px', boxShadow: '10px 10px 30px rgba(0,0,0,0.5)' },
+  panelLabel: { color: '#4b5563', fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '20px' },
+  bigStat: { fontSize: '50px', fontWeight: '900', color: '#fff' },
+  statSub: { fontSize: '14px', color: '#991b1b' },
+  actionGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' },
+  iconAction: { background: '#0f0f0f', padding: '20px', textAlign: 'center', fontSize: '10px', border: '1px solid #1a1a1a' },
+  logoutBtn: { background: 'none', border: '1px solid #333', color: '#4b5563', padding: '8px 20px', cursor: 'pointer' },
+  logoText: { fontWeight: '900', letterSpacing: '4px', fontSize: '20px' }
 };
 
 export default App;

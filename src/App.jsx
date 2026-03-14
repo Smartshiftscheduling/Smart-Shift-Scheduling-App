@@ -1,9 +1,25 @@
+
 import React, { useState } from 'react';
+import useAgent from './ai/useAgent';
+import LandingCarousel from './LandingCarousel';
+import AdminDashboard from './admin/AdminDashboard';
+import EmployeeDashboard from './employee/EmployeeDashboard';
 
 const App = () => {
+
   const [view, setView] = useState('landing');
-  const [activeTab, setActiveTab] = useState(0); 
+  const [activeTab, setActiveTab] = useState(0);
   const [idInput, setIdInput] = useState('');
+
+  // AI Agent integration
+  const agent = useAgent();
+  const [aiInput, setAiInput] = useState('');
+  const [aiOutput, setAiOutput] = useState('');
+  const [aiMode, setAiMode] = useState('question'); // 'question', 'schedule', 'optimize'
+
+  // Tutorial modal state
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
 
   const tabs = [
     { id: 0, label: 'STAFF' },
@@ -12,31 +28,71 @@ const App = () => {
   ];
 
   const handleLogin = () => {
-    if (idInput === 'ADMIN-MASTER' || idInput.length >= 4) setView('dashboard');
-    else alert("Access Denied");
+    if (idInput === 'ADMIN-MASTER' || idInput.length >= 4) {
+      setView('dashboard');
+      // Show tutorial for new users
+      setShowTutorial(true);
+      setTutorialStep(0);
+    } else alert("Access Denied");
   };
 
+  // Track which dashboard to show: 'admin', 'employee', or null
+  const [dashboardType, setDashboardType] = useState(null);
   if (view === 'landing') {
     return (
-      <div style={styles.landingPage}>
-        <div style={styles.glassSign}>
-          <div style={styles.accentBar}></div>
-          <h1 style={styles.mainTitle}>SMARTSHIFT</h1>
-          <input 
-            type="password" 
-            placeholder="••••" 
-            style={styles.auroraInput}
-            value={idInput}
-            onChange={(e) => setIdInput(e.target.value)}
-          />
-          <button style={styles.auroraButton} onClick={handleLogin}>INITIALIZE</button>
-        </div>
-      </div>
+      <LandingCarousel
+        onEmployeeLogin={() => {
+          setDashboardType('employee');
+          setView('dashboard');
+          setShowTutorial(true);
+          setTutorialStep(0);
+        }}
+        onAdminLogin={() => {
+          setDashboardType('admin');
+          setView('dashboard');
+          setShowTutorial(true);
+          setTutorialStep(0);
+        }}
+        onSignUp={() => {
+          alert('Sign up flow coming soon!');
+        }}
+      />
     );
+  }
+
+  if (dashboardType === 'admin') {
+    return <AdminDashboard adminName="Jordan Maxwell" adminRole="General Manager" />;
+  }
+  if (dashboardType === 'employee') {
+    return <EmployeeDashboard />;
   }
 
   return (
     <div style={styles.dashboard}>
+      {/* Tutorial Modal */}
+      {showTutorial && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: '#18181b', color: '#fff', padding: 40, borderRadius: 8, minWidth: 340, maxWidth: 400, textAlign: 'center', boxShadow: '0 8px 32px #000' }}>
+            <div style={{ marginBottom: 24, fontWeight: 'bold', fontSize: 18 }}>Tutorial</div>
+            <div style={{ marginBottom: 24 }}>{agent.getTutorialSteps()[tutorialStep]}</div>
+            <div>
+              <button
+                style={{ marginRight: 12, padding: '8px 18px', background: '#991b1b', color: '#fff', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}
+                onClick={() => {
+                  if (tutorialStep < agent.getTutorialSteps().length - 1) setTutorialStep(tutorialStep + 1);
+                  else setShowTutorial(false);
+                }}
+              >{tutorialStep < agent.getTutorialSteps().length - 1 ? 'Next' : 'Finish'}</button>
+              {tutorialStep > 0 && (
+                <button
+                  style={{ padding: '8px 18px', background: '#333', color: '#fff', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}
+                  onClick={() => setTutorialStep(tutorialStep - 1)}
+                >Back</button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       <nav style={styles.nav}>
         <div style={styles.logoText}>SMARTSHIFT <span style={{color: '#991b1b'}}>PRO</span></div>
         <div style={styles.tabContainer}>
@@ -89,10 +145,54 @@ const App = () => {
 
           {/* TAB 2: SYSTEM */}
           <div style={styles.carouselPage}>
-             <div style={styles.glassPanel}>
-                <div style={styles.panelLabel}>Security</div>
-                <div style={{fontSize: '40px', color: '#991b1b', fontWeight: 'bold'}}>ENCRYPTED</div>
-             </div>
+            <div style={styles.glassPanel}>
+              <div style={styles.panelLabel}>AI Agent Console</div>
+              <div style={{ marginBottom: 16 }}>
+                <select value={aiMode} onChange={e => setAiMode(e.target.value)} style={{ marginRight: 8 }}>
+                  <option value="question">Q&A</option>
+                  <option value="schedule">Auto-Schedule</option>
+                  <option value="optimize">Optimize Allocation</option>
+                </select>
+                <input
+                  type="text"
+                  placeholder={aiMode === 'question' ? 'Ask a question...' : aiMode === 'schedule' ? 'Enter shift/staff data' : 'Enter allocation data'}
+                  value={aiInput}
+                  onChange={e => setAiInput(e.target.value)}
+                  style={{ width: 220, marginRight: 8 }}
+                />
+                <button
+                  style={{ background: '#991b1b', color: '#fff', border: 'none', padding: '8px 16px', fontWeight: 'bold', cursor: 'pointer' }}
+                  onClick={() => {
+                    let result;
+                    if (aiMode === 'question') {
+                      result = agent.answerQuestion(aiInput);
+                      setAiOutput(result);
+                    } else if (aiMode === 'schedule') {
+                      let data;
+                      try { data = JSON.parse(aiInput); } catch { data = {}; }
+                      result = agent.autoSchedule(data.shifts || [], data.staff || [], data.constraints || {});
+                      setAiOutput(JSON.stringify(result));
+                    } else if (aiMode === 'optimize') {
+                      let data;
+                      try { data = JSON.parse(aiInput); } catch { data = {}; }
+                      result = agent.optimizeAllocation(data.staff || [], data.shifts || [], data.preferences || {});
+                      setAiOutput(JSON.stringify(result));
+                    }
+                  }}
+                >RUN</button>
+                <button
+                  style={{ background: '#333', color: '#fff', border: 'none', padding: '8px 16px', fontWeight: 'bold', marginLeft: 8, cursor: 'pointer' }}
+                  onClick={() => setAiOutput(agent.generateFeatureVideo())}
+                >Generate Feature Video</button>
+                <button
+                  style={{ background: '#222', color: '#fff', border: 'none', padding: '8px 16px', fontWeight: 'bold', marginLeft: 8, cursor: 'pointer' }}
+                  onClick={() => { setShowTutorial(true); setTutorialStep(0); }}
+                >Show Tutorial</button>
+              </div>
+              <div style={{ background: '#18181b', color: '#fff', padding: 12, minHeight: 40, border: '1px solid #333', fontSize: 13 }}>
+                {aiOutput || 'AI output will appear here.'}
+              </div>
+            </div>
           </div>
         </div>
       </div>

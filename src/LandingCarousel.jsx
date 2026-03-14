@@ -1,3 +1,4 @@
+
 // src/LandingCarousel.jsx
 // Reference image: 69a7c900470b5eb327bd6bd8_image-4.webp (not used as background)
 // New design: 3 separate glass cards (center: demo/pricing/signup, left: employee sign in, right: admin sign in)
